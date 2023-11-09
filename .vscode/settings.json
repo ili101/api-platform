@@ -1,7 +1,7 @@
 {
     "symfony-vscode.phpExecutablePath": "/usr/local/bin/php",
-    "phpunit.phpunit": "/workspace/api/bin/phpunit",
+    "phpunit.phpunit": "/srv/api/bin/phpunit",
     "phpunit.args": [
-        "--configuration /workspace/api/phpunit.xml.dist"
+        "--configuration /srv/api/phpunit.xml.dist"
     ],
 }
