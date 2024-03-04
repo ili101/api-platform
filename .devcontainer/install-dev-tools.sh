@@ -1,3 +1,6 @@
+# Trust all repositories
+git config --global --add safe.directory '*'
+
 ## Install PowerShell example ##
 # install the requirements
 apk add --no-cache \
