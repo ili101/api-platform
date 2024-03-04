@@ -13,6 +13,9 @@
             // "xdebugSettings": {
             //     "max_data": -1,
             // },
+            "skipFiles": [
+                "**/vendor/**",
+            ],
             "ignore": [
                 // "**/vendor/**",
                 "**/bootstrap.php",
