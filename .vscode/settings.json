@@ -1,0 +1,10 @@
+{
+    "symfony-vscode.phpExecutablePath": "/usr/local/bin/php",
+    "phpunit.phpunit": "/srv/api/bin/phpunit",
+    "phpunit.args": [
+        "--configuration /srv/api/phpunit.xml.dist"
+    ],
+    "powershell.powerShellAdditionalExePaths": {
+        "pwsh": "/opt/microsoft/powershell/7/pwsh"
+    },
+}
