@@ -100,6 +100,7 @@ const Welcome = () => (
           </h2>
           <div className="flex justify-center flex-wrap | lg:justify-start lg:grid lg:gap-5 lg:grid-cols-2">
             <Card image={apiPicture} title="API" url="/docs" />
+            <Card image={apiPicture} title="Help" url="/help" />
             <Card image={adminPicture} title="Admin" url="/admin" />
             <Card
               image={mercurePicture}
