@@ -2,27 +2,27 @@
 
 namespace App\Repository;
 
-use App\Entity\Sun;
+use App\Entity\Sub;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<Sun>
+ * @extends ServiceEntityRepository<Sub>
  *
- * @method Sun|null find($id, $lockMode = null, $lockVersion = null)
- * @method Sun|null findOneBy(array $criteria, array $orderBy = null)
- * @method Sun[]    findAll()
- * @method Sun[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method Sub|null find($id, $lockMode = null, $lockVersion = null)
+ * @method Sub|null findOneBy(array $criteria, array $orderBy = null)
+ * @method Sub[]    findAll()
+ * @method Sub[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class SunRepository extends ServiceEntityRepository
+class SubRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, Sun::class);
+        parent::__construct($registry, Sub::class);
     }
 
     //    /**
-    //     * @return Sun[] Returns an array of Sun objects
+    //     * @return Sub[] Returns an array of Sub objects
     //     */
     //    public function findByExampleField($value): array
     //    {
@@ -36,7 +36,7 @@ class SunRepository extends ServiceEntityRepository
     //        ;
     //    }
 
-    //    public function findOneBySomeField($value): ?Sun
+    //    public function findOneBySomeField($value): ?Sub
     //    {
     //        return $this->createQueryBuilder('s')
     //            ->andWhere('s.exampleField = :val')

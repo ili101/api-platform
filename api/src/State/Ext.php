@@ -5,7 +5,7 @@ namespace App\State;
 use ApiPlatform\Metadata\DeleteOperationInterface;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
-use App\Entity\Sun;
+use App\Entity\Sub;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 class Ext implements ProcessorInterface
@@ -24,11 +24,11 @@ class Ext implements ProcessorInterface
         if ($operation instanceof DeleteOperationInterface) {
             return $this->removeProcessor->process($data, $operation, $uriVariables, $context);
         }
-        $s = new Sun();
-        $s->setName('Sun2');
-        $s->setMain($data);
-        $s->setTip($data->getSub()->first()->getTip());
-        $data->addSub($s);
+        // $s = new Sub();
+        // $s->setName('Sub2');
+        // $s->setMain($data);
+        // $s->setTip($data->getSub()->first()->getTip());
+        // $data->addSub($s);
         $result = $this->persistProcessor->process($data, $operation, $uriVariables, $context);
 
         return $result;

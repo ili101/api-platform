@@ -4,38 +4,82 @@ namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\GraphQl\DeleteMutation;
+use ApiPlatform\Metadata\GraphQl\Mutation;
+use ApiPlatform\Metadata\GraphQl\Query;
+use ApiPlatform\Metadata\GraphQl\QueryCollection;
 use App\Repository\MainRepository;
 use App\State\Ext;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
+use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 
 #[ORM\Entity(repositoryClass: MainRepository::class)]
 #[ApiResource(
-    processor: Ext::class
+    processor: Ext::class,
+    normalizationContext: [AbstractNormalizer::GROUPS => ['Main:write']],
+    denormalizationContext: [AbstractNormalizer::GROUPS => ['Main:write']],
+    graphQlOperations: [
+        new Query(
+            denormalizationContext: ['groups' => ['Main:write']],
+            normalizationContext: ['groups' => ['Main:write']]
+        ),
+        new QueryCollection(
+            denormalizationContext: ['groups' => ['Main:write']],
+            normalizationContext: ['groups' => ['Main:write']]
+        ),
+        new Mutation(
+            name: 'create',
+            denormalizationContext: ['groups' => ['Main:write']],
+            normalizationContext: ['groups' => ['Main:write']]
+        ),
+        new Mutation(
+            name: 'update',
+            denormalizationContext: ['groups' => ['Main:write']],
+            normalizationContext: ['groups' => ['Main:write']]
+        ),
+        new DeleteMutation(
+            name: 'delete',
+            denormalizationContext: ['groups' => ['Main:write']],
+            normalizationContext: ['groups' => ['Main:write']]
+        )
+    ]
 )]
 class Main
 {
+    #[Groups(groups: ['Main:write'])]
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    // #[ApiProperty(identifier: true, readable: true, writable: true)]
     private ?int $id = null;
 
+    #[Groups(groups: ['Main:write'])]
     #[ORM\Column(length: 255)]
     private ?string $name = null;
 
-    #[ORM\OneToMany(mappedBy: 'main', targetEntity: Sun::class, orphanRemoval: true, cascade: ['remove', 'persist', 'refresh', 'merge', 'detach'])]
-    #[ApiProperty(readableLink: true, writableLink: true, genId: false)]
-    private Collection $sub;
+    #[Groups(groups: ['Main:write'])]
+    #[ORM\OneToMany(mappedBy: 'main', targetEntity: Sub::class, orphanRemoval: true, cascade: ['remove', 'persist', 'refresh', 'merge', 'detach'])]
+    #[ApiProperty(readableLink: true, writableLink: true)]
+    private Collection $subs;
 
     public function __construct()
     {
-        $this->sub = new ArrayCollection();
+        $this->subs = new ArrayCollection();
     }
 
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function setId(int $id): static
+    {
+        $this->id = $id;
+
+        return $this;
     }
 
     public function getName(): ?string
@@ -51,26 +95,26 @@ class Main
     }
 
     /**
-     * @return Collection<int, Sun>
+     * @return Collection<int, Sub>
      */
-    public function getSub(): Collection
+    public function getSubs(): Collection
     {
-        return $this->sub;
+        return $this->subs;
     }
 
-    public function addSub(Sun $sub): static
+    public function addSub(Sub $sub): static
     {
-        if (!$this->sub->contains($sub)) {
-            $this->sub->add($sub);
+        if (!$this->subs->contains($sub)) {
+            $this->subs->add($sub);
             $sub->setMain($this);
         }
 
         return $this;
     }
 
-    public function removeSub(Sun $sub): static
+    public function removeSub(Sub $sub): static
     {
-        if ($this->sub->removeElement($sub)) {
+        if ($this->subs->removeElement($sub)) {
             // set the owning side to null (unless already changed)
             if ($sub->getMain() === $this) {
                 $sub->setMain(null);

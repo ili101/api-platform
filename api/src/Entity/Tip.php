@@ -7,30 +7,40 @@ use App\Repository\TipRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: TipRepository::class)]
 #[ApiResource]
 class Tip
 {
+    #[Groups(groups: ['Main:write'])]
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
 
+    #[Groups(groups: ['Main:write'])]
     #[ORM\Column(length: 255)]
     private ?string $name = null;
 
-    #[ORM\OneToMany(mappedBy: 'tip', targetEntity: Sun::class)]
-    private Collection $suns;
+    #[ORM\OneToMany(mappedBy: 'tip', targetEntity: Sub::class)]
+    private Collection $subs;
 
     public function __construct()
     {
-        $this->suns = new ArrayCollection();
+        $this->subs = new ArrayCollection();
     }
 
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function setId(int $id): static
+    {
+        $this->id = $id;
+
+        return $this;
     }
 
     public function getName(): ?string
@@ -46,29 +56,29 @@ class Tip
     }
 
     /**
-     * @return Collection<int, Sun>
+     * @return Collection<int, Sub>
      */
-    public function getSuns(): Collection
+    public function getSubs(): Collection
     {
-        return $this->suns;
+        return $this->subs;
     }
 
-    public function addSun(Sun $sun): static
+    public function addSub(Sub $sub): static
     {
-        if (!$this->suns->contains($sun)) {
-            $this->suns->add($sun);
-            $sun->setTip($this);
+        if (!$this->subs->contains($sub)) {
+            $this->subs->add($sub);
+            $sub->setTip($this);
         }
 
         return $this;
     }
 
-    public function removeSun(Sun $sun): static
+    public function removeSub(Sub $sub): static
     {
-        if ($this->suns->removeElement($sun)) {
+        if ($this->subs->removeElement($sub)) {
             // set the owning side to null (unless already changed)
-            if ($sun->getTip() === $this) {
-                $sun->setTip(null);
+            if ($sub->getTip() === $this) {
+                $sub->setTip(null);
             }
         }
 
