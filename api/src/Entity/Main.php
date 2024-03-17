@@ -65,6 +65,11 @@ class Main
     #[ApiProperty(readableLink: true, writableLink: true)]
     private Collection $subs;
 
+    #[Groups(groups: ['Main:write'])]
+    #[ApiProperty(readableLink: true, writableLink: true)]
+    #[ORM\ManyToOne(inversedBy: 'mains', cascade: ['remove', 'persist', 'refresh', 'merge', 'detach'])]
+    private ?One $one = null;
+
     public function __construct()
     {
         $this->subs = new ArrayCollection();
@@ -120,6 +125,18 @@ class Main
                 $sub->setMain(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getOne(): ?One
+    {
+        return $this->one;
+    }
+
+    public function setOne(?One $one): static
+    {
+        $this->one = $one;
 
         return $this;
     }

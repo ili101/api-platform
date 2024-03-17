@@ -10,7 +10,11 @@ $Body = @"
       "name": "string",
       "tip": "/tips/1"
     }
-  ]
+  ],
+  "one": {
+    "name": "string",
+    "tip": "/tips/1"
+  }
 }
 "@ | ConvertFrom-Json | ConvertTo-Json
 $Action = Invoke-RestMethod -Uri ($Uri + 'mains') -ContentType $ContentType -Headers $Headers -Method Post -Body $Body | ConvertTo-Json | ConvertFrom-Json -AsHashtable
@@ -35,5 +39,5 @@ $Body = @"
   ]
 }
 "@ | ConvertFrom-Json | ConvertTo-Json
-$Action = Invoke-RestMethod -Uri ($Uri + 'mains/' + $ActionId) -ContentType $ContentType -Headers $Headers -Method Put -Body $Body ConvertTo-Json #| ConvertFrom-Json -AsHashtable
+$Action = Invoke-RestMethod -Uri ($Uri + 'mains/' + $ActionId) -ContentType $ContentType -Headers $Headers -Method Put -Body $Body #ConvertTo-Json #| ConvertFrom-Json -AsHashtable
 $Action
