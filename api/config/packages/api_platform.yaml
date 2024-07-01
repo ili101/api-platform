@@ -6,26 +6,22 @@ api_platform:
         include_type: true
     formats:
         jsonld: ['application/ld+json']
-        graphql: ['application/graphql']
-        json: ['application/json']
     docs_formats:
         jsonld: ['application/ld+json']
         jsonopenapi: ['application/vnd.openapi+json']
-        json: ['application/json']
         html: ['text/html']
     # Good defaults for REST APIs
     defaults:
-        pagination_enabled: false
         stateless: true
         cache_headers:
             vary: ['Content-Type', 'Authorization', 'Origin']
         extra_properties:
             standard_put: true
             rfc_7807_compliant_errors: true
-    # change this to true if you use controllers
-    use_symfony_listeners: false
-        # WORKAROUND: Can't put collection property without @id but @id can't be added if extra properties are disabled.
         denormalization_context:
             allow_extra_attributes: false
-    event_listeners_backward_compatibility_layer: false
+        normalization_context:
+            skip_null_values: false
+    # change this to true if you use controllers
+    use_symfony_listeners: false
     keep_legacy_inflector: false

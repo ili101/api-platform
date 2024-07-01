@@ -4,10 +4,6 @@ namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
-use ApiPlatform\Metadata\GraphQl\DeleteMutation;
-use ApiPlatform\Metadata\GraphQl\Mutation;
-use ApiPlatform\Metadata\GraphQl\Query;
-use ApiPlatform\Metadata\GraphQl\QueryCollection;
 use App\Repository\MainRepository;
 use App\State\Ext;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -24,31 +20,6 @@ use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
         AbstractNormalizer::GROUPS => ['Main:write'],
         'additional_allowed_attributes' => ['@id', '@type', 'id', '@context'],
     ],
-    graphQlOperations: [
-        new Query(
-            denormalizationContext: ['groups' => ['Main:write']],
-            normalizationContext: ['groups' => ['Main:write']]
-        ),
-        new QueryCollection(
-            denormalizationContext: ['groups' => ['Main:write']],
-            normalizationContext: ['groups' => ['Main:write']]
-        ),
-        new Mutation(
-            name: 'create',
-            denormalizationContext: ['groups' => ['Main:write']],
-            normalizationContext: ['groups' => ['Main:write']]
-        ),
-        new Mutation(
-            name: 'update',
-            denormalizationContext: ['groups' => ['Main:write']],
-            normalizationContext: ['groups' => ['Main:write']]
-        ),
-        new DeleteMutation(
-            name: 'delete',
-            denormalizationContext: ['groups' => ['Main:write']],
-            normalizationContext: ['groups' => ['Main:write']]
-        )
-    ]
 )]
 class Main
 {
