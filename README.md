@@ -68,7 +68,7 @@ The `api-platform` binary will be available in `~/.composer/vendor/bin`.
 
 ```sh
 api-platform                # interactive wizard
-api-platform my-app --framework=symfony --with-docker --with-pwa
+api-platform my-app --framework=symfony --with-docker --with-pwa --with-database
 api-platform my-app --framework=laravel
 ```
 

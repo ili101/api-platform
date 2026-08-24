@@ -46,6 +46,7 @@ final class InstallerCommand extends Command
             ->addOption('with-pwa', null, InputOption::VALUE_NEGATABLE, 'Include Next.js PWA (Symfony only)')
             ->addOption('with-admin', null, InputOption::VALUE_NEGATABLE, 'Include React-admin SPA')
             ->addOption('with-docker', null, InputOption::VALUE_NEGATABLE, 'Use Docker (Symfony only)')
+            ->addOption('with-database', null, InputOption::VALUE_NEGATABLE, 'Create a Doctrine entity and database migration (Symfony only)')
             ->addOption('with-agents', null, InputOption::VALUE_NEGATABLE, 'Write AI agent instruction files AGENTS.md and CLAUDE.md (default: yes)')
             ->addOption('format', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'API formats (jsonld|jsonapi|hal); repeat for several')
             ->addOption('docs', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Documentation (swagger_ui|redoc|scalar); repeat for several, empty disables');
@@ -123,12 +124,18 @@ final class InstallerCommand extends Command
     {
         $withDocker = false;
         $withPwa = false;
+        $withDatabase = false;
 
         if (self::FRAMEWORK_SYMFONY === $framework) {
             $dockerOption = $input->getOption('with-docker');
             $withDocker = null !== $dockerOption
                 ? (bool) $dockerOption
                 : (bool) $io->askQuestion(new ConfirmationQuestion('Use Docker?', true));
+
+            $databaseOption = $input->getOption('with-database');
+            $withDatabase = null !== $databaseOption
+                ? (bool) $databaseOption
+                : $input->isInteractive() && (bool) $io->askQuestion(new ConfirmationQuestion('Use a database?', false));
 
             $pwaOption = $input->getOption('with-pwa');
             if (null !== $pwaOption) {
@@ -147,6 +154,9 @@ final class InstallerCommand extends Command
             }
             if (true === $input->getOption('with-pwa')) {
                 throw new InvalidArgumentException('--with-pwa is not supported with Laravel.');
+            }
+            if (true === $input->getOption('with-database')) {
+                throw new InvalidArgumentException('--with-database is not supported with Laravel.');
             }
         }
 
@@ -167,6 +177,7 @@ final class InstallerCommand extends Command
             docs: $docs,
             withAdmin: $withAdmin,
             withAgents: $withAgents,
+            withDatabase: $withDatabase,
         );
     }
 

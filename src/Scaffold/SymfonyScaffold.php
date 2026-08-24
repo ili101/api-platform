@@ -15,7 +15,7 @@ use Symfony\Component\Yaml\Yaml;
 final class SymfonyScaffold
 {
     private const SYMFONY_DOCKER_REPO = 'https://github.com/dunglas/symfony-docker';
-    public const SYMFONY_DOCKER_REF = '3c0d1772e807a2e54b6c9c53471ef25c5782e275';
+    public const SYMFONY_DOCKER_REF = 'bd4320fa303d506c8a1d0593f0e9a7ed45dc13fb';
     private const DOCKER_FILES = [
         'Dockerfile',
         '.dockerignore',
@@ -29,6 +29,15 @@ final class SymfonyScaffold
         'jsonld' => 'application/ld+json',
         'jsonapi' => 'application/vnd.api+json',
         'hal' => 'application/hal+json',
+    ];
+    private const DATABASE_SETUP_COMMANDS = [
+        ['composer', 'require', 'symfony/maker-bundle', '--dev', '--no-interaction'],
+        ['composer', 'require', 'orm', '--no-interaction'],
+    ];
+    private const DATABASE_TEMPLATE_FILES = [
+        'database/Entity/Greetings.php' => 'src/Entity/Greetings.php',
+        'database/Repository/GreetingsRepository.php' => 'src/Repository/GreetingsRepository.php',
+        'database/Migrations/Version20260824200921.php' => 'migrations/Version20260824200921.php',
     ];
 
     private readonly Filesystem $fs;
@@ -88,9 +97,13 @@ final class SymfonyScaffold
         $this->fs->mkdir($routesDir);
         $this->fs->copy(Templates::path('routes.yaml'), $routesDir.'/api_platform.yaml', true);
 
-        $resourceDir = $apiDir.'/src/ApiResource';
-        $this->fs->mkdir($resourceDir);
-        $this->fs->copy(Templates::path('Greetings.php'), $resourceDir.'/Greetings.php', true);
+        if ($opts->withDatabase) {
+            $this->setupDatabase($apiDir, $opts->withDocker);
+        } else {
+            $resourceDir = $apiDir.'/src/ApiResource';
+            $this->fs->mkdir($resourceDir);
+            $this->fs->copy(Templates::path('Greetings.php'), $resourceDir.'/Greetings.php', true);
+        }
 
         if ($opts->withPwa) {
             $this->io->writeln('<info>Setting up Next.js PWA</info>');
@@ -166,6 +179,27 @@ final class SymfonyScaffold
         }
 
         return isset($json['require'][$package]) || isset($json['require-dev'][$package]);
+    }
+
+    private function setupDatabase(string $apiDir, bool $withDocker): void
+    {
+        $this->io->writeln('<info>Installing Doctrine database support</info>');
+        foreach (self::DATABASE_SETUP_COMMANDS as $command) {
+            $this->runner->run($command, $apiDir, self::databaseSetupEnvironment($withDocker));
+        }
+        foreach (self::DATABASE_TEMPLATE_FILES as $template => $destination) {
+            $destination = $apiDir.'/'.$destination;
+            $this->fs->mkdir(\dirname($destination));
+            $this->fs->copy(Templates::path($template), $destination, true);
+        }
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private static function databaseSetupEnvironment(bool $withDocker): array
+    {
+        return ['SYMFONY_DOCKER' => $withDocker ? '1' : '0'];
     }
 
     private function setupDocker(string $apiDir): void

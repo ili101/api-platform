@@ -114,6 +114,65 @@ final class InstallerCommandTest extends TestCase
         $this->assertStringContainsString('--with-pwa is not supported with Laravel', $tester->getDisplay());
     }
 
+    public function testRejectsWithDatabaseOnLaravel(): void
+    {
+        $tester = $this->tester();
+        $tester->execute(
+            ['name' => 'demo', '--framework' => 'laravel', '--with-database' => true],
+            ['interactive' => false],
+        );
+        $this->assertSame(2, $tester->getStatusCode());
+        $this->assertStringContainsString('--with-database is not supported with Laravel', $tester->getDisplay());
+    }
+
+    public function testDatabaseOptionIsPropagatedOnSymfony(): void
+    {
+        $opts = $this->resolveOptions([
+            'name' => 'demo',
+            '--framework' => 'symfony',
+            '--with-docker' => false,
+            '--with-pwa' => false,
+            '--with-admin' => false,
+            '--with-database' => true,
+        ]);
+
+        $this->assertTrue($opts->withDatabase);
+    }
+
+    public function testInteractiveDatabasePromptAppearsAfterDockerAndDefaultsToNo(): void
+    {
+        $command = new InstallerCommand();
+        $input = new ArrayInput([
+            'name' => 'demo',
+            '--framework' => 'symfony',
+            '--with-pwa' => false,
+            '--with-admin' => false,
+            '--format' => ['jsonld'],
+            '--docs' => ['swagger_ui'],
+        ]);
+        $input->bind($command->getDefinition());
+        $input->setInteractive(true);
+
+        $stream = fopen('php://memory', 'r+');
+        if (false === $stream) {
+            throw new \RuntimeException('Could not open memory stream.');
+        }
+        fwrite($stream, "\nyes\n");
+        rewind($stream);
+        $input->setStream($stream);
+
+        $output = new BufferedOutput();
+        $io = new SymfonyStyle($input, $output);
+        $method = new \ReflectionMethod($command, 'resolveOptions');
+        $opts = $method->invoke($command, $io, $input, InstallerCommand::FRAMEWORK_SYMFONY);
+        $display = $output->fetch();
+
+        $this->assertTrue($opts->withDocker);
+        $this->assertTrue($opts->withDatabase);
+        $this->assertStringContainsString('Use a database? (yes/no) [no]', $display);
+        $this->assertLessThan(strpos($display, 'Use a database?'), strpos($display, 'Use Docker?'));
+    }
+
     public function testAdminOptionIsAcceptedOnSymfony(): void
     {
         $command = new InstallerCommand();
@@ -243,7 +302,7 @@ final class InstallerCommandTest extends TestCase
             // Accept defaults for the two multiselect prompts (formats, docs).
             $tester->setInputs(['', '']);
             $tester->execute(
-                ['name' => basename($tmp), '--framework' => 'symfony', '--with-docker' => false, '--with-pwa' => false, '--with-admin' => false],
+                ['name' => basename($tmp), '--framework' => 'symfony', '--with-docker' => false, '--with-pwa' => false, '--with-admin' => false, '--with-database' => false],
                 ['interactive' => true],
             );
             if (false !== $cwd) {
@@ -277,6 +336,7 @@ final class InstallerCommandTest extends TestCase
             '--with-docker' => false,
             '--with-pwa' => false,
             '--with-admin' => false,
+            '--with-database' => false,
         ]);
     }
 
@@ -308,6 +368,7 @@ final class InstallerCommandTest extends TestCase
             '--with-docker' => false,
             '--with-pwa' => false,
             '--with-admin' => false,
+            '--with-database' => false,
             '--format' => ['jsonld'],
         ]);
         $input->bind($command->getDefinition());

@@ -26,6 +26,33 @@ final class SymfonyScaffoldTest extends TestCase
         $this->assertStringNotContainsString('use ApiPlatform\\Metadata\\Get;', $template);
     }
 
+    public function testDatabaseSetupInstallsPackagesNonInteractively(): void
+    {
+        $reflection = new \ReflectionClass(SymfonyScaffold::class);
+
+        $this->assertSame([
+            ['composer', 'require', 'symfony/maker-bundle', '--dev', '--no-interaction'],
+            ['composer', 'require', 'orm', '--no-interaction'],
+        ], $reflection->getConstant('DATABASE_SETUP_COMMANDS'));
+        $this->assertSame([
+            'database/Entity/Greetings.php' => 'src/Entity/Greetings.php',
+            'database/Repository/GreetingsRepository.php' => 'src/Repository/GreetingsRepository.php',
+            'database/Migrations/Version20260824200921.php' => 'migrations/Version20260824200921.php',
+        ], $reflection->getConstant('DATABASE_TEMPLATE_FILES'));
+
+        $this->assertFileExists(Templates::path('database/Entity/Greetings.php'));
+        $this->assertFileExists(Templates::path('database/Repository/GreetingsRepository.php'));
+        $this->assertFileExists(Templates::path('database/Migrations/Version20260824200921.php'));
+    }
+
+    public function testDatabaseSetupAnswersFlexDockerRecipePrompt(): void
+    {
+        $method = new \ReflectionMethod(SymfonyScaffold::class, 'databaseSetupEnvironment');
+
+        $this->assertSame(['SYMFONY_DOCKER' => '1'], $method->invoke(null, true));
+        $this->assertSame(['SYMFONY_DOCKER' => '0'], $method->invoke(null, false));
+    }
+
     public function testEnablesSelectedDocsAndDisablesOthers(): void
     {
         $config = SymfonyScaffold::buildApiPlatformConfig(new ScaffoldOptions(
