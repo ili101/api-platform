@@ -80,11 +80,9 @@ final class SymfonyScaffoldTest extends TestCase
         $this->assertFalse($config['enable_scalar']);
     }
 
-    public function testSymfonyDockerRefIsPinnedToFullCommitSha(): void
+    public function testSymfonyDockerRefDefaultsToMain(): void
     {
-        // A floating ref (branch name) means every install would track upstream
-        // HEAD; pinning to a 40-char SHA-1 guarantees reproducible scaffolds.
-        $this->assertMatchesRegularExpression('/^[0-9a-f]{40}$/', SymfonyScaffold::SYMFONY_DOCKER_REF);
+        $this->assertSame('main', SymfonyScaffold::SYMFONY_DOCKER_REF);
     }
 
     public function testSymfonyDockerCopyListIncludesDevcontainer(): void
